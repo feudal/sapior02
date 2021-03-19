@@ -1,10 +1,5 @@
 from top_window import TopWindow
-from under_cell import *
-
-
-class FrameOfCells:
-    def __init__(self, window, width, height, nr_bombs):
-        under_cells_field = CellField(window, width, height, nr_bombs)
+from cell_field import CellField
 
 
 class Minesweeper:
@@ -15,4 +10,4 @@ class Minesweeper:
         self.height = height
 
         self.top_window = TopWindow(window, self.nr_bombs)
-        self.frame_of_cells = FrameOfCells(window, width, height, self.nr_bombs)
+        self.cells_field = CellField(window, width, height, self.nr_bombs)
