@@ -7,14 +7,15 @@ class TopWindow:
     """
     Show the time, number of unfounded bombs, and restart the game
     """
+
     def __init__(self, window, nr_bombs):
         self.nr_bombs = nr_bombs
         self.t = Timer(window)
         self.t.grid(row=0, column=0)
         self.b1 = Button(window, text='Start', command=self.start)
-        self.b1.grid(row=0, column=1)
+        self.b1.grid(row=0, column=2, columnspan=2, pady=5)
         self.l2 = Label(window, text=self.nr_bombs)
-        self.l2.grid(row=0, column=2)
+        self.l2.grid(row=0, column=4)
 
     def start(self):
         self.t.trigger_timer()
