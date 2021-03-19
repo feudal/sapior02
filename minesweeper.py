@@ -1,9 +1,4 @@
-from tkinter import Entry
-
-
-class TopWindow:
-    def __init__(self, window, nr_bombs):
-        self.nr_bombs = nr_bombs
+from top_window import TopWindow
 
 
 class UnderCellField:
@@ -33,9 +28,8 @@ class FrameOfCells:
 
 
 class Minesweeper:
-
     def __init__(self, window, width=15, height=12):
-        self.nr_bombs = int(width * height) / 6
+        self.nr_bombs = int(width * height / 6)
         self.total_cells = width * height
         self.width = width
         self.height = height
