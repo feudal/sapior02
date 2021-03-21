@@ -4,7 +4,7 @@ from top_window import TopWindow
 
 
 class Minesweeper:
-    def __init__(self, window, width=30, height=30):  # width=15, height=12):
+    def __init__(self, window, width=8, height=4):  # width=15, height=12):
         self.nr_bombs = int(width * height / 6)
         self.total_cells = width * height
         self.width = width
