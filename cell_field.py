@@ -15,13 +15,16 @@ class CellField:
         map_bombs = self.put_borders(map_bombs)
         map_bombs = self.put_numbers(map_bombs)
         self.list_uc = self.create_under_cell_field(window, map_bombs)
-        print(self.list_uc[10].order)
         self.erase_border(self.list_uc)
 
         #  Create cover for field
         self.list_oc = []
         self.cover_field(window)
         self.erase_border(self.list_oc)
+
+        # all over cells will now about the list of all cells in the field and width of field
+        for i in range(len(self.list_oc)):
+            self.list_oc[i].get_lists(list_ocf=self.list_oc, list_ucf=self.list_uc, width_f=self.width)
 
     def mapbombs(self):
         # create a my_list of values like empty() or bomb(*)
@@ -33,8 +36,8 @@ class CellField:
 
         return m
 
-    def put_borders(self, map):
-        m = map.copy()
+    def put_borders(self, my_map):
+        m = my_map.copy()
         new_m = []
         for i in range(self.height):
             new_m.append(m[0:self.width])
@@ -54,8 +57,8 @@ class CellField:
 
         return m
 
-    def put_numbers(self, map):
-        m = map.copy()
+    def put_numbers(self, my_map):
+        m = my_map.copy()
         for i in range(len(m)):
             m[i] = self.count_bombs(m, i)
 
@@ -106,7 +109,7 @@ class CellField:
         }
         ucf = []  # ucf under_cell_field the list of under_cells
         for i in range((self.width + 2) * (self.height + 2)):
-            ucf.append(UnderCell(window, text=map_bombs[i], order=i + 1, ucell_color=give_color[map_bombs[i]],
+            ucf.append(UnderCell(window, text=map_bombs[i], order=i, ucell_color=give_color[map_bombs[i]],
                                  ucell_bg_color='white'))
 
         # Arrange the under_cells in the field
@@ -119,19 +122,20 @@ class CellField:
         return ucf
 
     def erase_border(self, l_under_cells):
-        for i in range(0, (self.width+2)*(self.height+2), self.width + 2):
+        for i in range(0, (self.width + 2) * (self.height + 2), self.width + 2):
             l_under_cells[i].erase()
-        for i in range(self.width+1, (self.width+1)*(self.height+3), self.width + 2):
+        for i in range(self.width + 1, (self.width + 1) * (self.height + 3), self.width + 2):
             l_under_cells[i].erase()
-        for i in range(0, self.width+1):
+        for i in range(0, self.width + 1):
             l_under_cells[i].erase()
         l_under_cells.reverse()
-        for i in range(0, self.width+1):
+        for i in range(0, self.width + 1):
             l_under_cells[i].erase()
+        l_under_cells.reverse()
 
     def cover_field(self, window):
         for i in range((self.width + 2) * (self.height + 2)):
-            self.list_oc.append(OverCell(window, text=i + 1, order=i + 1, ocell_color='black',
+            self.list_oc.append(OverCell(window, text=i, order=i, ocell_color='black',
                                          ocell_bg_color='white'))
 
         ocf_copy = self.list_oc.copy()
@@ -144,9 +148,18 @@ class CellField:
 class OverCell:
     def __init__(self, window, text=0, order=0, ocell_color='grey95', ocell_bg_color='grey95',
                  command=open):
+        self.width_field = None
+        self.list_uc = None
+        self.list_oc = None
+        self.is_open = False
         self.order = order
         self.text = text
         self.b1 = Button(window, text=text, bg=ocell_bg_color, fg=ocell_color, width=3, command=self.open)
+
+    def get_lists(self, list_ocf, list_ucf, width_f):
+        self.list_uc = list_ucf
+        self.list_oc = list_ocf
+        self.width_field = width_f
 
     def mygrid(self, row, column):
         self.b1.grid(row=row, column=column)
@@ -158,23 +171,45 @@ class OverCell:
         return self.order
 
     def open(self):
+        if self.is_open:
+            return
+        self.is_open = True
         self.b1.grid_forget()
-    #     my_list = CellField.list_uc.copy()
-    #     print('mylist =', CellField.list_uc)
-    #     self.b1.grid_forget()
-    #     print(self.get_order())
-    #
-    #     if my_list[self.get_order()] == '*':
-    #         print('explode')
-    #         self.explode()
-    #
-    # def explode(self):
-    #     my_list = CellField.list_uc.copy()
-    #     my_list2 = OverCellField.list_oc.copy()
-    #     for i in my_list:
-    #         print('i =', i)
-    #         if i.cget('text') == '*':
-    #             my_list2[i].open()
+
+        if self.list_uc[self.order].text == '':
+            self.open_around()
+        if self.list_uc[self.order].text == '*':
+            self.explode()
+            # window you lose
+
+    def open_around(self):
+        pass
+        # if m[i - self.width_field - 3] == '*':
+        #     break
+        # else:
+        #     self.list_oc[i - self.width_field - 3]
+        # if m[i - self.width_field - 2] == '*':
+        #     nr_bombs += 1
+        # if m[i - self.width_field - 1] == '*':
+        #     nr_bombs += 1
+        #
+        # if m[i + 1] == '*':
+        #     nr_bombs += 1
+        # if m[i - 1] == '*':
+        #     nr_bombs += 1
+        #
+        # if m[i + self.width_field + 1] == '*':
+        #     nr_bombs += 1
+        # if m[i + self.width_field + 2] == '*':
+        #     nr_bombs += 1
+        # if m[i + self.width_field + 3] == '*':
+        #     nr_bombs += 1
+
+    def explode(self):
+        for i in self.list_uc:
+            if i.text == '*':
+                self.list_oc[i.order].erase()
+                self.list_uc[i.order].explode_bomb()
 
 
 class UnderCell:
@@ -192,3 +227,6 @@ class UnderCell:
 
     def get_order(self):
         return self.order
+
+    def explode_bomb(self):
+        self.l1.config(bg='red')
