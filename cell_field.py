@@ -3,12 +3,15 @@ from tkinter import Button, Label
 
 
 class CellField:
-    def __init__(self, window, width, height, nr_bombs):
+    def __init__(self, window, width, height, nr_bombs, top_w):
+        self.top_wind =top_w
         #  list under cells
         self.list_uc = []
         self.width = width
         self.height = height
         self.nr_bombs = nr_bombs
+        global nr_cells_need_to_open
+        nr_cells_need_to_open = width * height - int(width * height / 6)
 
         #  Create under field
         map_bombs = self.mapbombs()
@@ -24,7 +27,7 @@ class CellField:
 
         # all over cells will now about the list of all cells in the field and width of field
         for i in range(len(self.list_oc)):
-            self.list_oc[i].get_lists(list_ocf=self.list_oc, list_ucf=self.list_uc, width_f=self.width)
+            self.list_oc[i].get_info(list_ocf=self.list_oc, list_ucf=self.list_uc, width_f=self.width, top_w=self.top_wind)
 
     def mapbombs(self):
         # create a my_list of values like empty() or bomb(*)
@@ -54,6 +57,9 @@ class CellField:
         for i in new_m:
             for j in i:
                 m.append(j)
+
+        for i in new_m:
+            print(i)
 
         return m
 
@@ -135,8 +141,8 @@ class CellField:
 
     def cover_field(self, window):
         for i in range((self.width + 2) * (self.height + 2)):
-            self.list_oc.append(OverCell(window, text=i, order=i, ocell_color='black',
-                                         ocell_bg_color='white'))
+            btn = OverCell(window, text=i, order=i, ocell_color='black', ocell_bg_color='white')
+            self.list_oc.append(btn)
 
         ocf_copy = self.list_oc.copy()
         for i in range(self.height + 2):
@@ -148,24 +154,29 @@ class CellField:
 class OverCell:
     def __init__(self, window, text=0, order=0, ocell_color='grey95', ocell_bg_color='grey95',
                  command=open):
+        self.top_wind = None
         self.width_field = None
+        self.height_field = None
         self.list_uc = None
         self.list_oc = None
         self.is_open = False
+        self.is_mark = False
         self.order = order
         self.text = text
         self.b1 = Button(window, text=text, bg=ocell_bg_color, fg=ocell_color, width=3, command=self.open)
+        self.b1.bind("<Button-3>", lambda e, i=self.order: self.mark_cell(e, i))
 
-    def get_lists(self, list_ocf, list_ucf, width_f):
+    def get_info(self, list_ocf, list_ucf, width_f, top_w):
         self.list_uc = list_ucf
         self.list_oc = list_ocf
         self.width_field = width_f
-
-    def mygrid(self, row, column):
-        self.b1.grid(row=row, column=column)
+        self.top_wind = top_w
 
     def erase(self):
         self.b1.grid_forget()
+
+    def mygrid(self, row, column):
+        self.b1.grid(row=row, column=column)
 
     def get_order(self):
         return self.order
@@ -174,42 +185,58 @@ class OverCell:
         if self.is_open:
             return
         self.is_open = True
+        global nr_cells_need_to_open
+        nr_cells_need_to_open -= 1
         self.b1.grid_forget()
+        if nr_cells_need_to_open == 0:
+            print('you win')
 
         if self.list_uc[self.order].text == '':
-            self.open_around()
+            self.open_around(self.order)
         if self.list_uc[self.order].text == '*':
             self.explode()
-            # window you lose
+            print('you lose')
 
-    def open_around(self):
-        pass
-        # if m[i - self.width_field - 3] == '*':
-        #     break
-        # else:
-        #     self.list_oc[i - self.width_field - 3]
-        # if m[i - self.width_field - 2] == '*':
-        #     nr_bombs += 1
-        # if m[i - self.width_field - 1] == '*':
-        #     nr_bombs += 1
-        #
-        # if m[i + 1] == '*':
-        #     nr_bombs += 1
-        # if m[i - 1] == '*':
-        #     nr_bombs += 1
-        #
-        # if m[i + self.width_field + 1] == '*':
-        #     nr_bombs += 1
-        # if m[i + self.width_field + 2] == '*':
-        #     nr_bombs += 1
-        # if m[i + self.width_field + 3] == '*':
-        #     nr_bombs += 1
+    def open_around(self, order):
+        if self.check_cell(order - self.width_field - 3):
+            self.list_oc[order - self.width_field - 3].open()
+        if self.check_cell(order - self.width_field - 2):
+            self.list_oc[order - self.width_field - 2].open()
+        if self.check_cell(order - self.width_field - 1):
+            self.list_oc[order - self.width_field - 1].open()
+
+        if self.check_cell(order - 1):
+            self.list_oc[order - 1].open()
+        if self.check_cell(order + 1):
+            self.list_oc[order + 1].open()
+
+        if self.check_cell(order + self.width_field + 3):
+            self.list_oc[order + self.width_field + 3].open()
+        if self.check_cell(order + self.width_field + 2):
+            self.list_oc[order + self.width_field + 2].open()
+        if self.check_cell(order + self.width_field + 1):
+            self.list_oc[order + self.width_field + 1].open()
+
+    def check_cell(self, order):
+        if self.list_uc[order].text not in ('*', '-') and not self.list_oc[order].is_open:
+            return True
+        return False
 
     def explode(self):
         for i in self.list_uc:
             if i.text == '*':
-                self.list_oc[i.order].erase()
-                self.list_uc[i.order].explode_bomb()
+                self.list_oc[i.order].b1.grid_forget()
+                self.list_uc[i.order].l1.config(bg='red')
+
+    def mark_cell(self, event, order):
+        if not self.list_oc[order].is_mark:
+            self.list_oc[order].b1.config(text="X", fg='black')
+            self.is_mark = True
+            self.top_wind.minus_bomb()
+        else:
+            self.list_oc[order].b1.config(text=order, fg='black')
+            self.is_mark = False
+            self.top_wind.plus_bomb()
 
 
 class UnderCell:
@@ -228,5 +255,3 @@ class UnderCell:
     def get_order(self):
         return self.order
 
-    def explode_bomb(self):
-        self.l1.config(bg='red')
