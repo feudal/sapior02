@@ -1,5 +1,6 @@
 from random import shuffle
-from tkinter import Button, Label
+from tkinter import Button, Label, Toplevel
+from win_lose import WinWindow, LoseWindow
 
 
 class CellField:
@@ -154,6 +155,7 @@ class CellField:
 class OverCell:
     def __init__(self, window, text=0, order=0, ocell_color='grey95', ocell_bg_color='grey95',
                  command=open):
+        self.w = window
         self.top_wind = None
         self.width_field = None
         self.height_field = None
@@ -182,20 +184,30 @@ class OverCell:
         return self.order
 
     def open(self):
-        if self.is_open:
-            return
         self.is_open = True
         global nr_cells_need_to_open
         nr_cells_need_to_open -= 1
         self.b1.grid_forget()
         if nr_cells_need_to_open == 0:
             print('you win')
+            top_w = Toplevel(self.w)
+            win_window = WinWindow(top_w, self.restart_game, self.exit)
 
         if self.list_uc[self.order].text == '':
             self.open_around(self.order)
         if self.list_uc[self.order].text == '*':
             self.explode()
             print('you lose')
+            top_w = Toplevel(self.w)
+            lose_window = LoseWindow(top_w, self.restart_game, self.exit)
+
+    def exit(self):
+        print('exit')
+        self.w.destroy()
+
+    def restart_game(self):
+        print('restart game')
+        pass
 
     def open_around(self, order):
         if self.check_cell(order - self.width_field - 3):
