@@ -1,3 +1,4 @@
+import os
 from random import shuffle
 from tkinter import Button, Label, Toplevel
 from win_lose import WinWindow, LoseWindow
@@ -5,7 +6,7 @@ from win_lose import WinWindow, LoseWindow
 
 class CellField:
     def __init__(self, window, width, height, nr_bombs, top_w):
-        self.top_wind =top_w
+        self.top_wind = top_w
         #  list under cells
         self.list_uc = []
         self.width = width
@@ -28,7 +29,8 @@ class CellField:
 
         # all over cells will now about the list of all cells in the field and width of field
         for i in range(len(self.list_oc)):
-            self.list_oc[i].get_info(list_ocf=self.list_oc, list_ucf=self.list_uc, width_f=self.width, top_w=self.top_wind)
+            self.list_oc[i].get_info(list_ocf=self.list_oc, list_ucf=self.list_uc, width_f=self.width,
+                                     top_w=self.top_wind)
 
     def mapbombs(self):
         # create a my_list of values like empty() or bomb(*)
@@ -184,6 +186,10 @@ class OverCell:
         return self.order
 
     def open(self):
+        if not self.top_wind.is_started:
+            self.top_wind.is_started = True
+            self.top_wind.start()
+
         self.is_open = True
         global nr_cells_need_to_open
         nr_cells_need_to_open -= 1
@@ -205,9 +211,10 @@ class OverCell:
         print('exit')
         self.w.destroy()
 
-    def restart_game(self):
+    def restart_game(self, window):
         print('restart game')
-        pass
+        self.w.destroy()
+        os.startfile("main.pyw")
 
     def open_around(self, order):
         if self.check_cell(order - self.width_field - 3):
@@ -235,6 +242,7 @@ class OverCell:
         return False
 
     def explode(self):
+        self.top_wind.start()
         for i in self.list_uc:
             if i.text == '*':
                 self.list_oc[i.order].b1.grid_forget()
@@ -266,4 +274,3 @@ class UnderCell:
 
     def get_order(self):
         return self.order
-
