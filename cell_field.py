@@ -256,7 +256,7 @@ class OverCell:
             self.is_mark = True
             self.top_wind.minus_bomb()
         else:
-            self.list_oc[order].b1.config(text=order, fg='black')
+            self.list_oc[order].b1.config(text=order)
             self.is_mark = False
             self.top_wind.plus_bomb()
 
