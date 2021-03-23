@@ -3,6 +3,7 @@ from tkinter import Label, Button
 
 class WinWindow:
     def __init__(self, w, new_game, exit_game):
+        self.window = w
         w.title('You win')
         l1 = Label(w, text="You win")
         l1.grid(row=0, column=8, pady=10)
@@ -14,6 +15,7 @@ class WinWindow:
 
 class LoseWindow:
     def __init__(self, w, new_game, exit_game):
+        self.window = w
         w.title('You lose')
         l1 = Label(w, text="You lose")
         l1.grid(row=0, column=8, pady=10)

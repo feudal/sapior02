@@ -113,13 +113,17 @@ class CellField:
             '4': 'brown',
             '5': 'brown',
             '6': 'brown',
+            '7': 'brown',
+            '8': 'brown',
             '-': 'brown',
             '': 'brown'
         }
         ucf = []  # ucf under_cell_field the list of under_cells
         for i in range((self.width + 2) * (self.height + 2)):
             ucf.append(UnderCell(window, text=map_bombs[i], order=i, ucell_color=give_color[map_bombs[i]],
-                                 ucell_bg_color='white'))
+                                 ucell_bg_color='grey85'))
+            if ucf[i].text == '':
+                ucf[i].l1.config(bg='white')
 
         # Arrange the under_cells in the field
         ucf_copy = ucf.copy()
@@ -144,7 +148,7 @@ class CellField:
 
     def cover_field(self, window):
         for i in range((self.width + 2) * (self.height + 2)):
-            btn = OverCell(window, text=i, order=i, ocell_color='black', ocell_bg_color='white')
+            btn = OverCell(window, text=i, order=i, ocell_bg_color='white')
             self.list_oc.append(btn)
 
         ocf_copy = self.list_oc.copy()
@@ -155,7 +159,7 @@ class CellField:
 
 
 class OverCell:
-    def __init__(self, window, text=0, order=0, ocell_color='grey95', ocell_bg_color='grey95',
+    def __init__(self, window, text=0, order=0, ocell_color='grey99', ocell_bg_color='grey95',
                  command=open):
         self.w = window
         self.top_wind = None
@@ -198,6 +202,7 @@ class OverCell:
             print('you win')
             top_w = Toplevel(self.w)
             win_window = WinWindow(top_w, self.restart_game, self.exit)
+            win_window.window.eval('tk::PlaceWindow . right')
 
         if self.list_uc[self.order].text == '':
             self.open_around(self.order)
@@ -206,6 +211,7 @@ class OverCell:
             print('you lose')
             top_w = Toplevel(self.w)
             lose_window = LoseWindow(top_w, self.restart_game, self.exit)
+            lose_window.window.eval('tk::PlaceWindow . right')
 
     def exit(self):
         print('exit')
@@ -254,7 +260,7 @@ class OverCell:
             self.is_mark = True
             self.top_wind.minus_bomb()
         else:
-            self.list_oc[order].b1.config(text=order, fg='black')
+            self.list_oc[order].b1.config(text=order, fg='grey99')
             self.is_mark = False
             self.top_wind.plus_bomb()
 
