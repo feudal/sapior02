@@ -4,7 +4,11 @@ from top_window import TopWindow
 
 
 class Minesweeper:
-    def __init__(self, window, width=8, height=4):  # width=15, height=12):
+    """
+    Minesweeper game you can to choose the size of the game changing width and height
+    parameters.
+    """
+    def __init__(self, window, width=25, height=20):  # width=15, height=12):
         self.nr_bombs = int(width * height / 6)
         self.total_cells = width * height
         self.width = width

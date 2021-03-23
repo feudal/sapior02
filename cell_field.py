@@ -113,6 +113,8 @@ class CellField:
             '4': 'brown',
             '5': 'brown',
             '6': 'brown',
+            '7': 'brown',
+            '8': 'brown',
             '-': 'brown',
             '': 'brown'
         }
@@ -144,7 +146,7 @@ class CellField:
 
     def cover_field(self, window):
         for i in range((self.width + 2) * (self.height + 2)):
-            btn = OverCell(window, text=i, order=i, ocell_color='black', ocell_bg_color='white')
+            btn = OverCell(window, text=i, order=i, ocell_bg_color='white')
             self.list_oc.append(btn)
 
         ocf_copy = self.list_oc.copy()
@@ -155,7 +157,7 @@ class CellField:
 
 
 class OverCell:
-    def __init__(self, window, text=0, order=0, ocell_color='grey95', ocell_bg_color='grey95',
+    def __init__(self, window, text=0, order=0, ocell_color='grey99', ocell_bg_color='grey95',
                  command=open):
         self.w = window
         self.top_wind = None
